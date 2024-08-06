@@ -1,17 +1,26 @@
-import { Form } from "react-router-dom";
-import avatar from '../assets/you.png'
+import { Form, useLoaderData } from "react-router-dom";
+// import avatar from '../assets/you.png'
 import DOMPurify from "dompurify";
+import { getContact } from "../contacts";
+
+
+export const loader = async ({params}) => {
+  const contact = await getContact(params.contact);
+  return {contact}
+}
 
 
 const Contact = () => {
-  const contact = {
-    first: "Your",
-    last: "Name",
-    avatar: avatar,
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  const contact = useLoaderData();
+  // const contact = {
+  //   first: "Your",
+  //   last: "Name",
+  //   avatar: avatar,
+  //   twitter: "your_handle",
+  //   notes: "Some notes",
+  //   favorite: true,
+  // };
+
 
   return (
     <div id="contact">

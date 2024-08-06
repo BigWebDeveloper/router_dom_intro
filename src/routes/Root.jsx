@@ -1,5 +1,6 @@
-import { Outlet, Link, useLoaderData } from "react-router-dom";
+import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
 import DOMPurify from "dompurify";
+
 
 const Root = () => {
   const { contacts } = useLoaderData();
@@ -22,9 +23,9 @@ const Root = () => {
             </div>
           </form>
 
-          <form method="post">
+          <Form method="post">
             <button type="submit">New</button>
-          </form>
+          </Form>
         </div>
         <nav>
           {contacts.length ? 
