@@ -1,27 +1,46 @@
-import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
+import { Outlet, useLoaderData, Form, redirect, NavLink, useNavigation } from "react-router-dom";
 import DOMPurify from "dompurify";
+import { getContacts } from "../contacts";
+import { createContact } from "../contacts";
+// import { useEffect } from "react";
 
+
+export const loader = async ( {request} ) => {
+const url = new URL(request.url);
+const q = url.searchParams.get("q");
+const contacts = await getContacts(q);
+  return { contacts, q };
+}
+
+
+export const action = async () => {
+  const contact = await createContact();
+  return redirect(`/contacts/${contact.id}/edit`);
+}
 
 const Root = () => {
-  const { contacts } = useLoaderData();
+  const { contacts, q } = useLoaderData();
+  const navigation = useNavigation();
   const favorite = DOMPurify.sanitize("&#9733");
-  console.log(contacts)
+
+
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <form role="search" id="search-form">
+          <Form role="search" id="search-form">
             <input
               type="search"
               aria-label="search contacts"
               placeholder="search"
               name="q"
+              defaultValue={q}
             />
             <div id="search-spinner" aria-hidden hidden={true}>
               <div className="sr-only" aria-live="polite"></div>
             </div>
-          </form>
+          </Form>
 
           <Form method="post">
             <button type="submit">New</button>
@@ -32,7 +51,8 @@ const Root = () => {
           <ul>
           {contacts.map((contact, index) => (
             <li key={index}>
-              <Link to={`/contacts/${contact.id}`}>
+              <NavLink to={`/contacts/${contact.id}`} 
+              className={({isActive, ispending}) => isActive ? "active" : ispending ?"pending" : ""}>
                 {contact.first || contact.last ? (
                   <>
                     {contact.first} {contact.last}
@@ -41,7 +61,7 @@ const Root = () => {
                   <i>No Name</i>
                 )}{" "}
                 {contact.favorite && <span dangerouslySetInnerHTML={{__html: favorite}}/>}
-              </Link>
+              </NavLink>
             </li>
           ))}
           </ul> :
@@ -53,7 +73,7 @@ const Root = () => {
           
         </nav>
       </div>
-      <div id="detail">
+      <div id="detail" className={navigation.state === "loading" ? "loading" : "" }>
         <Outlet />
       </div>
     </>

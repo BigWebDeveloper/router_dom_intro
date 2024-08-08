@@ -3,15 +3,16 @@ import { Form, useLoaderData } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { getContact } from "../contacts";
 
-
 export const loader = async ({params}) => {
-  const contact = await getContact(params.contact);
-  return {contact}
+  const contact = await getContact(params.contactId);
+  return { contact };
 }
 
-
 const Contact = () => {
-  const contact = useLoaderData();
+  const {contact} = useLoaderData();
+  console.log(contact);
+  console.log(contact.first);
+  
   // const contact = {
   //   first: "Your",
   //   last: "Name",
