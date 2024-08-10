@@ -8,9 +8,10 @@ import Contact from './routes/Contact'
 import { action as rootAction, loader as rootLoader} from './routes/Root'
 import { action as editAction } from './routes/Edit'
 import Edit from './routes/Edit'
-import { loader as contactLoader } from './routes/Contact'
+import { Loader as contactLoader } from './routes/Contact'
 import {Action as destroyAction} from './routes/Destroy'
 import { Index } from './routes/Index'
+import {Action as contactAction} from './routes/Contact'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -20,25 +21,31 @@ const router = createBrowserRouter([
     action: rootAction,
     children:[
       {
-        element: <Index />,
-        index:true
-      },
-      {
-        path: "contacts/:contactId",
-        element: <Contact />,
-        loader: contactLoader,
-      },
-      {
-        path: "contacts/:contactId/destroy",
-        action: destroyAction,
-        errorElement: <div>Oops! There was an error.</div>
-      },
-      {
-        path: "contacts/:contactId/edit",
-        element: <Edit />,
-        loader: contactLoader,
-        action:editAction
-      },
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            element: <Index />,
+            index:true
+          },
+          {
+            path: "contacts/:contactId",
+            element: <Contact />,
+            loader: contactLoader,
+            action: contactAction
+          },
+          {
+            path: "contacts/:contactId/destroy",
+            action: destroyAction,
+            errorElement: <div>Oops! There was an error.</div>
+          },
+          {
+            path: "contacts/:contactId/edit",
+            element: <Edit />,
+            loader: contactLoader,
+            action:editAction
+          },
+        ]
+      }
 
     ]
   }
