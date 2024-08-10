@@ -1,17 +1,29 @@
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useLoaderData, useFetcher } from "react-router-dom";
+
 // import avatar from '../assets/you.png'
 import DOMPurify from "dompurify";
-import { getContact } from "../contacts";
+import { getContact, updateContact } from "../contacts";
 
-export const loader = async ({params}) => {
+export const Loader = async ({params}) => {
   const contact = await getContact(params.contactId);
+  if (!contact) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    })
+  }
   return { contact };
+}
+
+export const Action = async ({request, params}) => {
+const formData = await request.formData();
+return updateContact(params.contactId, {
+  favorite: formData.get("favorite") === "true"
+})
 }
 
 const Contact = () => {
   const {contact} = useLoaderData();
-  console.log(contact);
-  console.log(contact.first);
   
   // const contact = {
   //   first: "Your",
@@ -77,10 +89,12 @@ const Contact = () => {
 };
 
 export const Favorite = (contact) => {
-  const favorite = contact.contact.favorite;
+  
+  const fetcher = useFetcher();
+  const favorite = fetcher.formData ? fetcher.formData.get("favorite"):contact.contact.favorite;
   const entitysecured = DOMPurify.sanitize(favorite ? "&#9733" : "&#9734");
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -88,7 +102,7 @@ export const Favorite = (contact) => {
       >
         <span dangerouslySetInnerHTML={{__html: entitysecured}}/>
       </button>
-    </Form>
+    </fetcher.Form>
   );
 };
 
